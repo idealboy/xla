@@ -306,3 +306,28 @@ You can find additional useful reading materials in
 * [OpenXLA](https://github.com/openxla)
 * [HuggingFace](https://huggingface.co/docs/accelerate/en/basic_tutorials/tpu)
 * [JetStream](https://github.com/google/JetStream-pytorch)
+
+## Custom Notes
+1.对于gpu支持来说，是不健全的，例如：
+torch_xla.runtime.global_runtime_device_count总返回1，这是因为，在old version中，存在bug，新的master代码已经修复了，所以，需要重新clone新的xla的代码
+2.torch xla是基于openxla的，在编译过冲中会下载openxla组件
+3.compute_35不支持，可以将.cache中的com[pute_35相关的去掉，再重新编译torch xla
+4.xla应该放在torch的源码目录中进行编译，否则，找不到aten等源码依赖的文件
+
+git clone https://github.com/pytorch/pytorch.git
+cd pytorch
+USE_CUDA=1 python setup.py install
+
+cd pytorch #注意
+git clone https://github.com/pytorch/xla.git
+cd xla
+XLA_CUDA=1 python setup.py install
+
+5.编译torch xla前设置环境变量
+
+echo "export PATH=\$PATH:/usr/local/cuda-12.1/bin" >> ~/.bashrc
+echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/cuda-12.1/lib64" >> ~/.bashrc
+source ~/.bashrc
+
+6.建议用ssh下载（需要添加ssh key到account中）torch/xla/openxla等源码，否则容易遇到EoF（网速不行，或Buffer不够，或其他的因素导致的，总之，https限制很多）
+
